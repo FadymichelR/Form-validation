@@ -65,8 +65,13 @@ $form
     
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $form->validate($_POST);
+      
       if ($form->isValid()) {
+      
+        // return valid data
+        $form->getData()
         // save
+        
       } else {
         // return array
         $form->getErrors()

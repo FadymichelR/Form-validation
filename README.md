@@ -15,7 +15,8 @@ $form
         FormValidator::REQUIRED,
         FormValidator::LENGTH => [
             'min' => 3,
-            'max' => 30
+            'max' => 30,
+            'message' => 'your error msg'
         ]
     ])
     ->addField('lastName', [
@@ -29,6 +30,13 @@ $form
         FormValidator::REQUIRED,
         FormValidator::EMAIL,
     ])
+    ->addField('dateTransfer', [
+        FormValidator::REQUIRED,
+        FormValidator::DATE => [
+            'format' => 'd/m/Y',
+            'message' => 'your error msg'
+        ]
+    ])
     ->addField('phone', [
         FormValidator::REQUIRED,
         FormValidator::PHONE
@@ -37,11 +45,14 @@ $form
         FormValidator::REQUIRED,
         FormValidator::INT => [
             'min_range' => 0,
-            'max_range' => $reservation->getCar()->getPlaces()
+            'max_range' => $reservation->getCar()->getPlaces(),
+            'message' => 'your error msg'
         ]
     ])
     ->addField('vol', [
-        FormValidator::REQUIRED,
+        FormValidator::REQUIRED => [
+            'message' => 'your error msg'
+        ]
         FormValidator::ALPHANUMERIC,
     ])
     ->addField('methodPayment', [

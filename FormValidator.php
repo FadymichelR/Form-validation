@@ -1,11 +1,17 @@
 <?php
+/**
+ * Created by Fadymichel.
+ * git: https://github.com/FadymichelR
+ * 2018
+ */
+
+namespace Fady\Form;
 
 
 class FormValidator
 {
 
     const REQUIRED = 1;
-    const PHONE = 2;
     const INT = 3;
     const EMAIL = 4;
     const NUMBER = 5;
@@ -18,47 +24,37 @@ class FormValidator
     /**
      * @var array
      */
-    private $errors = [];
+    protected $errors = [];
 
     /**
      * @var array
      */
-    private $fields = [];
+    protected $fields = [];
 
     /**
      * @var bool
      */
-    private $isValid = true;
+    protected $isValid = true;
 
     /**
      * @var array
      */
-    private $defaultErrorMsg = [];
+    protected $defaultErrorMsg = [
+        self::REQUIRED => "This field must be filled in",
+        self::INT => "Positive integer value is required",
+        self::EMAIL => "Invalid e-mail address format",
+        self::NUMBER => "Number is required",
+        self::DATE => "This value is not a valid date",
+        self::TIME => "This value is not a valid time",
+        self::LENGTH => "the number of characters must be between %s and %s",
+        self::ALPHANUMERIC => "all characters must be alphanumeric",
+        self::CHOICE => "incorrect value"
+    ];
 
     /**
      * @var array
      */
-    private $data = [];
-
-    /**
-     * FormValidator constructor.
-     */
-    public function __construct()
-    {
-        $this->defaultErrorMsg = [
-            self::REQUIRED => "This field must be filled in",
-            self::PHONE => "Number phone is not valid",
-            self::INT => "Positive integer value is required",
-            self::EMAIL => "Invalid e-mail address format",
-            self::NUMBER => "Number is required",
-            self::DATE => "This value is not a date",
-            self::TIME => "This value is not a time",
-            self::LENGTH => "Il doit contenir moins de caractere ou plus",
-            self::ALPHANUMERIC => "Cette valeur doit être seulement alphanumeric",
-            self::CHOICE => "Cette valeur est inccorecte"
-        ];
-
-    }
+    protected $data = [];
 
 
     public function validate(array $data)
@@ -117,6 +113,14 @@ class FormValidator
     public function getErrors()
     {
         return $this->errors;
+    }
+
+    /**
+     * @return string
+     */
+    public function getError($field)
+    {
+        return array_key_exists($field, $this->errors) ? $this->errors[$field] : '';
     }
 
     /**
@@ -261,6 +265,15 @@ class FormValidator
         return !empty($value) ? $value : false;
     }
 
+    /**
+     * @param $value
+     * @return bool
+     */
+    public function isNumeric($value)
+    {
+        return is_numeric($value);
+    }
+
     public function validateItem($value, $type, $option = null)
     {
         switch ($type) {
@@ -287,6 +300,9 @@ class FormValidator
                 break;
             case self::ALPHANUMERIC:
                 return $this->isAlnum($value);
+                break;
+            case self::NUMBER:
+                return $this->isNumeric($value);
                 break;
         }
         return $value;

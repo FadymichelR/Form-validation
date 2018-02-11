@@ -1,11 +1,21 @@
 <?php
+/**
+ * Created by Fadymichel.
+ * git: https://github.com/FadymichelR
+ * 2018
+ */
 
+namespace Fady\Form;
+
+
+use Fady\Form\Traits\Validator;
 
 class FormValidator
 {
 
+    use Validator;
+
     const REQUIRED = 1;
-    const PHONE = 2;
     const INT = 3;
     const EMAIL = 4;
     const NUMBER = 5;
@@ -18,47 +28,37 @@ class FormValidator
     /**
      * @var array
      */
-    private $errors = [];
+    protected $errors = [];
 
     /**
      * @var array
      */
-    private $fields = [];
+    protected $fields = [];
 
     /**
      * @var bool
      */
-    private $isValid = true;
+    protected $isValid = true;
 
     /**
      * @var array
      */
-    private $defaultErrorMsg = [];
+    protected $defaultErrorMsg = [
+        self::REQUIRED => "This field must be filled in",
+        self::INT => "Positive integer value is required",
+        self::EMAIL => "Invalid e-mail address format",
+        self::NUMBER => "Number is required",
+        self::DATE => "This value is not a valid date",
+        self::TIME => "This value is not a valid time",
+        self::LENGTH => "the number of characters must be between %s and %s",
+        self::ALPHANUMERIC => "all characters must be alphanumeric",
+        self::CHOICE => "incorrect value"
+    ];
 
     /**
      * @var array
      */
-    private $data = [];
-
-    /**
-     * FormValidator constructor.
-     */
-    public function __construct()
-    {
-        $this->defaultErrorMsg = [
-            self::REQUIRED => "This field must be filled in",
-            self::PHONE => "Number phone is not valid",
-            self::INT => "Positive integer value is required",
-            self::EMAIL => "Invalid e-mail address format",
-            self::NUMBER => "Number is required",
-            self::DATE => "This value is not a date",
-            self::TIME => "This value is not a time",
-            self::LENGTH => "Il doit contenir moins de caractere ou plus",
-            self::ALPHANUMERIC => "Cette valeur doit être seulement alphanumeric",
-            self::CHOICE => "Cette valeur est inccorecte"
-        ];
-
-    }
+    protected $data = [];
 
 
     public function validate(array $data)
@@ -120,6 +120,14 @@ class FormValidator
     }
 
     /**
+     * @return string
+     */
+    public function getError($field)
+    {
+        return array_key_exists($field, $this->errors) ? $this->errors[$field] : '';
+    }
+
+    /**
      * @param $field
      * @param $message
      */
@@ -148,118 +156,6 @@ class FormValidator
         return $this;
     }
 
-    /**
-     * @param $email
-     * @return mixed
-     */
-    public function isEmail($email)
-    {
-
-        return filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : false;
-    }
-
-    /**
-     * @param $value
-     * @return bool
-     */
-    public function isAlnum($value)
-    {
-        return ctype_alnum($value) ? $value : false;
-    }
-
-
-    /**
-     * @param $value
-     * @return bool
-     */
-    public function choice($value, $option)
-    {
-        return in_array($value, $option) ? $value : false;
-    }
-
-
-    /**
-     * @param $value
-     * @param null $option
-     * @return bool
-     */
-    public function validStrLen($value, $option = null)
-    {
-
-        $min = $option ? $option['min'] : null;
-        $max = $option ? $option['max'] : null;
-
-        $len = strlen($value);
-        if ($len < $min && !is_null($min)) {
-            return false;
-        } elseif ($len > $max && !is_null($max)) {
-            return false;
-        }
-        return $value;
-
-    }
-
-    /**
-     * @param $int
-     * @return bool
-     */
-    public function isInt($int, $option = null)
-    {
-
-        if (is_numeric($int)) {
-
-            $int = (int)$int;
-            return filter_var($int, FILTER_VALIDATE_INT, $option ? $options = [
-                'options' => $option
-            ] : FILTER_FLAG_ALLOW_OCTAL) ? $int : false;
-        }
-        return false;
-    }
-
-    /**
-     * @param $date
-     * @return bool|string
-     */
-    public function isDate($date, $option = null)
-    {
-        $format = $option ? $option['format'] : 'd-m-Y';
-
-        try {
-            $dateTime = new \DateTime();
-            $date = $dateTime->createFromFormat($format, $date);
-            return $date instanceof \DateTime ? $date : false;
-
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
-
-    /**
-     * @param $time
-     * @return bool|string
-     */
-    public function isTime($time, $option = null)
-    {
-        $format = $option ? $option['format'] : 'h:i';
-        try {
-            $dateTime = new \DateTime();
-            $time = $dateTime->createFromFormat($format, $time);
-            return $time instanceof \DateTime ? $time : false;
-
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
-
-    /**
-     * @param $value
-     * @return bool
-     */
-    public function isRequired($value)
-    {
-
-        return !empty($value) ? $value : false;
-    }
 
     public function validateItem($value, $type, $option = null)
     {
@@ -287,6 +183,9 @@ class FormValidator
                 break;
             case self::ALPHANUMERIC:
                 return $this->isAlnum($value);
+                break;
+            case self::NUMBER:
+                return $this->isNumeric($value);
                 break;
         }
         return $value;

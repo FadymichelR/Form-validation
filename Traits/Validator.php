@@ -133,7 +133,7 @@ trait Validator
      */
     public function isNumeric($value)
     {
-        return is_numeric($value);
+        return is_numeric($value) ? $value : false;
     }
 
 }

@@ -1,9 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: fadymichel
- * Date: 11/02/18
- * Time: 17:39
+ * Created by Fadymichel.
+ * git: https://github.com/FadymichelR
+ * 2018
  */
 
 namespace Fady\Form\Traits;
@@ -88,7 +87,7 @@ trait Validator
     {
         $format = $option ? $option['format'] : 'd-m-Y';
 
-        return $this->createDateTime($time, $format);
+        return $this->createDateTime($date, $format);
     }
 
     /**
@@ -107,7 +106,6 @@ trait Validator
      * @return bool|\DateTime
      */
     public function createDateTime($dateOrTime, $format = 'm-d-Y h:i') {
-        $format = $option ? $option['format'] : 'h:i';
 
         try {
             $dateTime = new \DateTime();

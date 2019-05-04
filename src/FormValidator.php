@@ -1,15 +1,19 @@
 <?php
 /**
- * Created by Fadymichel.
+ * Created by Fad.
  * git: https://github.com/FadymichelR
  * 2018
  */
 
-namespace Fady\Form;
+namespace Fad\Form;
 
 
-use Fady\Form\Traits\Validator;
+use Fad\Form\Traits\Validator;
 
+/**
+ * Class FormValidator
+ * @package Fad\Form
+ */
 class FormValidator
 {
 
@@ -60,36 +64,38 @@ class FormValidator
      */
     protected $data = [];
 
-
-    public function validate(array $data)
+    /**
+     * @param array $data
+     */
+    public function validate(array $data): void
     {
         $data = array_map([$this, 'clean'], $data);
 
         foreach ($data as $field => $value) {
 
-            if (array_key_exists($field, $this->fields)) {
-
-                foreach ($this->fields[$field] as $key => $filter) {
-
-                    $option = null;
-                    if (is_array($filter)) {
-                        $option = $filter;
-                        $filter = $key;
-                    }
-                    $response = $this->validateItem($value, $filter, $option);
-                    if ($response === false) {
-
-                        $this->addError(
-                            $field,
-                            isset($option['message'])
-                                ? $option['message']
-                                : $this->getDefaultErrorMsg($filter)
-                        );
-                    } else {
-                        $this->setData($field, $response);
-                    }
-                }
+            if (!array_key_exists($field, $this->fields)) {
+                continue;
             }
+
+            foreach ($this->fields[$field] as $key => $filter) {
+
+                $option = null;
+                if (is_array($filter)) {
+                    $option = $filter;
+                    $filter = $key;
+                }
+
+                if ($this->validateItem($value, $filter, $option) === false) {
+                    $this->addError(
+                        $field,
+                        isset($option['message'])
+                            ? $option['message']
+                            : $this->getDefaultErrorMsg($filter)
+                    );
+                }
+                $this->setData($field, $value);
+            }
+
         }
 
     }
@@ -106,7 +112,7 @@ class FormValidator
     /**
      * @return bool
      */
-    public function isValid()
+    public function isValid(): bool
     {
         return $this->isValid;
     }
@@ -114,7 +120,7 @@ class FormValidator
     /**
      * @return array
      */
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->errors;
     }
@@ -122,42 +128,50 @@ class FormValidator
     /**
      * @return string
      */
-    public function getError($field)
+    public function getError($field): string
     {
         return array_key_exists($field, $this->errors) ? $this->errors[$field] : '';
     }
 
     /**
-     * @param $field
-     * @param $message
+     * @param string $field
+     * @param string $message
      */
-    public function addError($field, $message)
+    public function addError(string $field, string $message): self
     {
         $this->errors[$field] = $message;
         $this->isValid = false;
+
+        return $this;
     }
 
     /**
      * @return array
      */
-    public function getFields()
+    public function getFields(): array
     {
         return $this->fields;
     }
 
     /**
-     * @param $field
-     * @param null $rule
-     * @return $this
+     * @param string $field
+     * @param array $filters
+     * @return FormValidator
      */
-    public function addField($field, array $filters = [])
+    public function addField(string $field, array $filters = []): self
     {
         $this->fields[$field] = $filters;
         return $this;
     }
 
 
-    public function validateItem($value, $type, $option = null)
+    /**
+     * @param $value
+     * @param int $type
+     * @param array $option
+     * @return bool|string
+     */
+    public function validateItem($value, int $type, array $option = []): bool
     {
         switch ($type) {
             case self::REQUIRED:
@@ -188,9 +202,13 @@ class FormValidator
                 return $this->isNumeric($value);
                 break;
         }
-        return $value;
+        return true;
     }
 
+    /**
+     * @param $data
+     * @return string
+     */
     public function clean($data)
     {
         $data = trim($data);
@@ -202,7 +220,7 @@ class FormValidator
     /**
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         return $this->data;
     }
@@ -210,9 +228,10 @@ class FormValidator
     /**
      * @param array $data
      */
-    public function setData($flied, $value)
+    public function setData(string $flied, $value): self
     {
         $this->data[$flied] = $value;
+        return $this;
     }
 
 }

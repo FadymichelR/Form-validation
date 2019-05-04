@@ -1,19 +1,22 @@
 <?php
 /**
- * Created by Fadymichel.
+ * Created by fad.
  * git: https://github.com/FadymichelR
  * 2018
  */
 
-namespace Fady\Form;
+namespace Fad\Form;
 
+use Fad\Form\Elements\Input;
 
-use Fady\Form\Elements\Input;
-
-class FormBuilder extends FormValidator
+/**
+ * Class FormBuilder
+ * @package Fad\Form
+ */
+class FormBuilder
 {
     const METHOD_POST = 'POST';
-    const METHOD_GET  = 'GET';
+    const METHOD_GET = 'GET';
 
     private $method = self::METHOD_POST;
 
@@ -38,22 +41,27 @@ class FormBuilder extends FormValidator
     private $attributes = [];
 
 
-
-    public function __construct($action = '', $method = self::METHOD_POST)
+    /**
+     * FormBuilder constructor.
+     * @param string $action
+     * @param string $method
+     */
+    public function __construct(string $action = '', string $method = self::METHOD_POST)
     {
         $this->action = $action;
         $this->method = $method;
     }
 
 
-    public function __toString()
+    /**
+     * @return string
+     */
+    public function __toString(): string
     {
         $result = $this->getStart();
 
         foreach ($this->getElements() as $element) {
-
             $result .= (string)$element;
-
         }
 
         $result .= $this->getEnd();
@@ -61,21 +69,27 @@ class FormBuilder extends FormValidator
         return $result;
     }
 
-    public function getStart() {
-
+    /**
+     * @return string
+     */
+    public function getStart(): string
+    {
         $result = sprintf('<form method="%s" id="%s" action="%s"', $this->getMethod(), $this->getFormId(), $this->getAction());
+
         foreach ($this->getAttributes() as $attr => $value) {
-
             $result .= sprintf(' %s="%s"', $attr, is_bool($value) ? ($value ? 'true' : 'false') : $value);
-
         }
+
         $result .= '>';
 
         return $result;
     }
 
-    public function getEnd() {
-
+    /**
+     * @return string
+     */
+    public function getEnd(): string
+    {
         $result = '</form>';
         return $result;
     }
@@ -84,38 +98,37 @@ class FormBuilder extends FormValidator
     /**
      * @return string
      */
-    public function getFormId()
+    public function getFormId(): string
     {
         return $this->formId === null ? 'form_builder' : $this->formId;
     }
 
     /**
-     * @param mixed $formId
+     * @param string $formId
+     * @return FormBuilder
      */
-    public function setFormId(string $formId)
+    public function setFormId(string $formId): self
     {
         $this->formId = $formId;
         return $this;
     }
 
     /**
-     * @return
+     * @return array
      */
-    public function getElements()
+    public function getElements(): array
     {
-        return (object)$this->elements;
+        return $this->elements;
     }
 
     /**
      * @param Input $input
      */
-    public function add(Input $input, $validator = [])
+    public function add(Input $input, array $validator = []): self
     {
         if (method_exists($this, 'addField')) {
-
             $this->addField($input->getName(), $validator);
         }
-
         $this->elements[$input->getName()] = $input;
 
         return $this;
@@ -124,15 +137,16 @@ class FormBuilder extends FormValidator
     /**
      * @return string
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method;
     }
 
     /**
      * @param string $method
+     * @return FormBuilder
      */
-    public function setMethod(string $method)
+    public function setMethod(string $method): self
     {
         $this->method = $method;
         return $this;
@@ -141,15 +155,16 @@ class FormBuilder extends FormValidator
     /**
      * @return string
      */
-    public function getAction()
+    public function getAction(): string
     {
         return $this->action;
     }
 
     /**
      * @param string $action
+     * @return FormBuilder
      */
-    public function setAction(string $action)
+    public function setAction(string $action): self
     {
         $this->action = $action;
         return $this;
@@ -158,15 +173,16 @@ class FormBuilder extends FormValidator
     /**
      * @return array
      */
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
 
     /**
      * @param array $attributes
+     * @return FormBuilder
      */
-    public function setAttributes(array $attributes)
+    public function setAttributes(array $attributes): self
     {
         $this->attributes = $attributes;
         return $this;

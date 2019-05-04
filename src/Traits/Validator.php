@@ -1,33 +1,35 @@
 <?php
 /**
- * Created by Fadymichel.
+ * Created by fad.
  * git: https://github.com/FadymichelR
  * 2018
  */
 
-namespace Fady\Form\Traits;
+namespace Fad\Form\Traits;
 
-
+/**
+ * Trait Validator
+ * @package Fad\Form\Traits
+ */
 trait Validator
 {
 
     /**
      * @param $email
-     * @return mixed
+     * @return bool
      */
-    public function isEmail($email)
+    public function isEmail(string $email): bool
     {
-
-        return filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : false;
+        return filter_var($email, FILTER_VALIDATE_EMAIL);
     }
 
     /**
      * @param $value
      * @return bool
      */
-    public function isAlnum($value)
+    public function isAlNum($value): bool
     {
-        return ctype_alnum($value) ? $value : false;
+        return ctype_alnum($value);
     }
 
 
@@ -35,9 +37,9 @@ trait Validator
      * @param $value
      * @return bool
      */
-    public function choice($value, $option)
+    public function choice($value, $option): bool
     {
-        return in_array($value, $option) ? $value : false;
+        return in_array($value, $option);
     }
 
 
@@ -46,11 +48,11 @@ trait Validator
      * @param null $option
      * @return bool
      */
-    public function validStrLen($value, $option = null)
+    public function validStrLen($value, array $option = []): bool
     {
 
-        $min = $option ? $option['min'] : null;
-        $max = $option ? $option['max'] : null;
+        $min = !empty($option) ? $option['min'] : null;
+        $max = !empty($option) ? $option['max'] : null;
 
         $len = strlen($value);
         if ($len < $min && !is_null($min)) {
@@ -58,7 +60,7 @@ trait Validator
         } elseif ($len > $max && !is_null($max)) {
             return false;
         }
-        return $value;
+        return true;
 
     }
 
@@ -66,37 +68,35 @@ trait Validator
      * @param $int
      * @return bool
      */
-    public function isInt($int, $option = null)
+    public function isInt($int, $option = null): bool
     {
 
         if (is_numeric($int)) {
-
             $int = (int)$int;
             return filter_var($int, FILTER_VALIDATE_INT, $option ? $options = [
                 'options' => $option
-            ] : FILTER_FLAG_ALLOW_OCTAL) ? $int : false;
+            ] : FILTER_FLAG_ALLOW_OCTAL);
         }
         return false;
     }
 
     /**
      * @param $date
-     * @return bool|string
+     * @return bool
      */
-    public function isDate($date, $option = null)
+    public function isDate(string $date, array $option = []): bool
     {
-        $format = $option ? $option['format'] : 'd-m-Y';
-
+        $format = !empty($option) ? $option['format'] : 'd-m-Y';
         return $this->createDateTime($date, $format);
     }
 
     /**
      * @param $time
-     * @return bool|string
+     * @return bool
      */
-    public function isTime($time, $option = null)
+    public function isTime(string $time, array $option = []): bool
     {
-        $format = $option ? $option['format'] : 'h:i';
+        $format = !empty($option) ? $option['format'] : 'h:i';
         return $this->createDateTime($time, $format);
     }
 
@@ -105,35 +105,32 @@ trait Validator
      * @param string $format
      * @return bool|\DateTime
      */
-    public function createDateTime($dateOrTime, $format = 'm-d-Y h:i') {
-
+    public function createDateTime(string $dateOrTime, $format = 'm-d-Y h:i'): bool
+    {
         try {
             $dateTime = new \DateTime();
-            $dateOrTime = $dateTime->createFromFormat($format, $dateOrTime);
-            return $dateOrTime instanceof \DateTime ? $dateOrTime : false;
-
+            return $dateTime->createFromFormat($format, $dateOrTime) instanceof \DateTime;
         } catch (\Exception $e) {
-            return false;
         }
+        return false;
     }
 
     /**
      * @param $value
      * @return bool
      */
-    public function isRequired($value)
+    public function isRequired(string $value): bool
     {
-
-        return !empty($value) ? $value : false;
+        return !empty($value);
     }
 
     /**
      * @param $value
      * @return bool
      */
-    public function isNumeric($value)
+    public function isNumeric($value): bool
     {
-        return is_numeric($value) ? $value : false;
+        return is_numeric($value);
     }
 
 }

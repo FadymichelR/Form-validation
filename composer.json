@@ -1,6 +1,6 @@
 {
-    "name": "fad/php-form-builder",
-    "description": "a Simple PHP repository pattern in a MVC architecture (Database Access)",
+    "name": "fad/php-form-builder-validation",
+    "description": "a Simple PHP form builder",
     "type": "package",
     "autoload": {
         "psr-4": {

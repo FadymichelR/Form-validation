@@ -40,6 +40,11 @@ class FormBuilder
      */
     private $attributes = [];
 
+    /**
+     * @var array
+     */
+    private $validations = [];
+
 
     /**
      * FormBuilder constructor.
@@ -124,12 +129,10 @@ class FormBuilder
     /**
      * @param Input $input
      */
-    public function add(Input $input, array $validator = []): self
+    public function add(Input $input, array $validation = []): self
     {
-        if (method_exists($this, 'addField')) {
-            $this->addField($input->getName(), $validator);
-        }
         $this->elements[$input->getName()] = $input;
+        $this->validations[$input->getName()] = $validation;
 
         return $this;
     }

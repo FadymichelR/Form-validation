@@ -37,6 +37,11 @@ class FormValidator
     /**
      * @var array
      */
+    protected $formErrors = [];
+
+    /**
+     * @var array
+     */
     protected $fields = [];
 
     /**
@@ -67,27 +72,27 @@ class FormValidator
     /**
      * @param array $data
      */
-    public function validate(array $data): void
+    public function submit(array $data): void
     {
         $data = array_map([$this, 'clean'], $data);
 
         foreach ($data as $field => $value) {
 
             if (!array_key_exists($field, $this->fields)) {
+                $this->addError(null, 'a non-existent field has been submitted');
                 continue;
             }
 
             foreach ($this->fields[$field] as $key => $filter) {
 
-                $option = null;
+                $option = [];
                 if (is_array($filter)) {
                     $option = $filter;
                     $filter = $key;
                 }
 
                 if ($this->validateItem($value, $filter, $option) === false) {
-                    $this->addError(
-                        $field,
+                    $this->addError($field,
                         isset($option['message'])
                             ? $option['message']
                             : $this->getDefaultErrorMsg($filter)
@@ -101,11 +106,12 @@ class FormValidator
     }
 
     /**
-     * @return array
+     * @param int $type
+     * @return string|null
      */
-    public function getDefaultErrorMsg($type)
+    public function getDefaultErrorMsg(int $type): ? string
     {
-        return $this->defaultErrorMsg[$type] ?: null;
+        return $this->defaultErrorMsg[$type] ?? null;
     }
 
 
@@ -128,7 +134,7 @@ class FormValidator
     /**
      * @return string
      */
-    public function getError($field): string
+    public function getError(string $field): string
     {
         return array_key_exists($field, $this->errors) ? $this->errors[$field] : '';
     }
@@ -137,11 +143,15 @@ class FormValidator
      * @param string $field
      * @param string $message
      */
-    public function addError(string $field, string $message): self
+    public function addError(?string $field, string $message): self
     {
-        $this->errors[$field] = $message;
-        $this->isValid = false;
+        if (is_null($field)) {
+            $this->formErrors[] = $message;
+        }else {
+            $this->errors[$field] = $message;
+        }
 
+        $this->isValid = false;
         return $this;
     }
 
@@ -158,12 +168,21 @@ class FormValidator
      * @param array $filters
      * @return FormValidator
      */
-    public function addField(string $field, array $filters = []): self
+    public function add(string $field, array $filters = []): self
     {
         $this->fields[$field] = $filters;
         return $this;
     }
 
+    /**
+     * @param array $fields
+     * @return FormValidator
+     */
+    public function setFields(array $fields): self
+    {
+        $this->fields = $fields;
+        return $this;
+    }
 
     /**
      * @param $value
@@ -171,7 +190,7 @@ class FormValidator
      * @param array $option
      * @return bool|string
      */
-    public function validateItem($value, int $type, array $option = []): bool
+    protected function validateItem($value, int $type, array $option = []): bool
     {
         switch ($type) {
             case self::REQUIRED:
@@ -209,7 +228,7 @@ class FormValidator
      * @param $data
      * @return string
      */
-    public function clean($data)
+    protected function clean($data)
     {
         $data = trim($data);
         $data = stripslashes($data);

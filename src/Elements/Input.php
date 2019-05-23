@@ -8,11 +8,13 @@
 
 namespace Fad\Form\Elements;
 
+use Fad\Form\Interfaces\FieldInterface;
+
 /**
  * Class Input
  * @package Fad\Form\Elements
  */
-class Input
+class Input implements FieldInterface
 {
 
     const HTML_ELEMENT = 'input';

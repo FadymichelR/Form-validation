@@ -17,17 +17,6 @@ use Fad\Form\Traits\Validator;
 class FormValidator
 {
 
-    use Validator;
-
-    const REQUIRED = 1;
-    const INT = 3;
-    const EMAIL = 4;
-    const NUMBER = 5;
-    const DATE = 6;
-    const TIME = 7;
-    const LENGTH = 8;
-    const ALPHANUMERIC = 9;
-    const CHOICE = 10;
 
     /**
      * @var array
@@ -49,20 +38,6 @@ class FormValidator
      */
     protected $isValid = true;
 
-    /**
-     * @var array
-     */
-    protected $defaultErrorMsg = [
-        self::REQUIRED => "This field must be filled in",
-        self::INT => "Positive integer value is required",
-        self::EMAIL => "Invalid e-mail address format",
-        self::NUMBER => "Number is required",
-        self::DATE => "This value is not a valid date",
-        self::TIME => "This value is not a valid time",
-        self::LENGTH => "the number of characters must be between %s and %s",
-        self::ALPHANUMERIC => "all characters must be alphanumeric",
-        self::CHOICE => "incorrect value"
-    ];
 
     /**
      * @var array
@@ -91,7 +66,7 @@ class FormValidator
                     $filter = $key;
                 }
 
-                if ($this->validateItem($value, $filter, $option) === false) {
+                if ($this->validateItem($value, $option) === false) {
                     $this->addError($field,
                         isset($option['message'])
                             ? $option['message']
@@ -105,14 +80,6 @@ class FormValidator
 
     }
 
-    /**
-     * @param int $type
-     * @return string|null
-     */
-    public function getDefaultErrorMsg(int $type): ? string
-    {
-        return $this->defaultErrorMsg[$type] ?? null;
-    }
 
 
     /**
@@ -190,38 +157,9 @@ class FormValidator
      * @param array $option
      * @return bool|string
      */
-    protected function validateItem($value, int $type, array $option = []): bool
+    protected function validateItem($value, array $option = []): bool
     {
-        switch ($type) {
-            case self::REQUIRED:
-                return $this->isRequired($value);
-                break;
-            case self::DATE:
-                return $this->isDate($value, $option);
-                break;
-            case self::TIME:
-                return $this->isTime($value, $option);
-                break;
-            case self::EMAIL:
-                return $this->isEmail($value);
-                break;
-            case self::INT:
-                return $this->isInt($value, $option);
-                break;
-            case self::LENGTH:
-                return $this->validStrLen($value, $option);
-                break;
-            case self::CHOICE:
-                return $this->choice($value, $option);
-                break;
-            case self::ALPHANUMERIC:
-                return $this->isAlnum($value);
-                break;
-            case self::NUMBER:
-                return $this->isNumeric($value);
-                break;
-        }
-        return true;
+
     }
 
     /**

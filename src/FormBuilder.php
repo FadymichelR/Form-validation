@@ -7,7 +7,8 @@
 
 namespace Fad\Form;
 
-use Fad\Form\Elements\Input;
+use Fad\Form\Interfaces\FieldInterface;
+use Fad\Form\Traits\Validator;
 
 /**
  * Class FormBuilder
@@ -43,7 +44,7 @@ class FormBuilder
     /**
      * @var array
      */
-    private $validations = [];
+    private $validators = [];
 
 
     /**
@@ -55,6 +56,7 @@ class FormBuilder
     {
         $this->action = $action;
         $this->method = $method;
+        $this->validator = new FormValidator();
     }
 
 
@@ -127,15 +129,18 @@ class FormBuilder
     }
 
     /**
-     * @param Input $input
+     * @param FieldInterface $input
+     * @param Validator[]
+     * @return FormBuilder
      */
-    public function add(Input $input, array $validation = []): self
+    public function add(FieldInterface $input, array $validation = []): self
     {
         $this->elements[$input->getName()] = $input;
-        $this->validations[$input->getName()] = $validation;
+        $this->validator->add($input->getName(), $validation);
 
         return $this;
     }
+
 
     /**
      * @return string
